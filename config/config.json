@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "qwkdj348SZ*#kawE*%kjfbS",
+    "database": "armholding_education",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "qwkdj348SZ*#kawE*%kjfbS",
+    "database": "armholding_education",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "qwkdj348SZ*#kawE*%kjfbS",
+    "database": "armholding_education",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
