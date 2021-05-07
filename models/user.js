@@ -46,15 +46,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'teacher_id'
     })
 
-
-
-
-    // let User_message = sequelize.define('User_messages')
-    // User.hasMany(User_message, {
-    //     foreignKey: 'id',
+    // let Teacher_student = sequelize.define('Teacher_student')
+    // User.hasMany(Teacher_student, {
+    //     foreignKey: 'student_id',
     // })
-
-
+    //
+    // User.hasMany(Teacher_student, {
+    //     foreignKey: 'teacher_id',
+    // })
 
     return User;
 };

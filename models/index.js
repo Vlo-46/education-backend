@@ -42,6 +42,5 @@ db.users = require('./user')(sequelize, Sequelize)
 db.free_hourses = require('./free_hours')(sequelize, Sequelize)
 db.teacher_students = require('./teacher_student')(sequelize, Sequelize)
 db.message = require('./message')(sequelize, Sequelize)
-db.user_message = require('./user_messages')(sequelize, Sequelize)
 
 module.exports = db;

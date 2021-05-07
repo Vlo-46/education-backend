@@ -10,7 +10,21 @@ module.exports = {
       },
       message: {
         type: Sequelize.TEXT,
-        allowNull: false
+        allowNull: false,
+      },
+      sender_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      receiver_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      seen_status: {
+        type: Sequelize.BOOLEAN
+      },
+      shipped: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,

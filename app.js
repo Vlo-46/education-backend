@@ -40,23 +40,67 @@ app.use('/api/subject', subjectRouter)
 app.use('/api/profile', profileRouter)
 app.use('/api/message', messageRouter)
 
+const {Op} = require("sequelize");
 
 const db = require("./models");
 const User = db.users;
-const User_message = db.user_message;
 const Message = db.message
 
 
-//sockets
-let messages = []
-
 io.on('connection', socket => {
+    socket.on('all messages', data => {
+        let {candidateId, someId} = data;
+        Message.findAll({
+            where: {
+                sender_id: {
+                    [Op.or]: [candidateId, someId]
+                },
+                receiver_id: {
+                    [Op.or]: [candidateId, someId]
+                },
+            }
+        })
+            .then(data => {
+                let messages = JSON.stringify(data, null, 2)
+                socket.emit('get all messages', JSON.parse(messages))
+            })
+            .catch(e => {
+                console.log(e)
+            })
 
-    socket.on('new message', data => {
-        messages.push(data)
-        socket.broadcast.emit('new message', data)
     })
 
+    socket.on('new message', data => {
+        Message.create({
+            message: data.message,
+            sender_id: data.sender_id,
+            receiver_id: data.receiver_id,
+            seen_status: false,
+            shipped: true
+        })
+            .then(data => {
+                let msg = JSON.stringify(data, null, 2)
+                socket.broadcast.emit('sended message', JSON.parse(msg))
+            })
+            .catch(e => {
+                console.log(e)
+            })
+    })
+
+    socket.on('delete message', id => {
+        console.log(id)
+        Message.destroy({where: {id}})
+            .then(num => {
+                if (num[0] === 1) {
+                    // res.send({msg: 'error'})
+                } else {
+                    socket.broadcast.emit('deleted message', id)
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    })
 
 
     socket.on('disconnected', () => {

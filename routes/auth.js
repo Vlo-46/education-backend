@@ -15,7 +15,6 @@ router.post('/delete_account', authController.deleteAccount)
 
 router.get('/all_users', authController.all_users)
 
-//testing
 router.get('/get_user', authController.get_user)
 
 module.exports = router;

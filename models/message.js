@@ -14,18 +14,21 @@ module.exports = (sequelize, DataTypes) => {
     Message.init({
         message: {
             type: DataTypes.TEXT,
-            allowNull: false
-        }
+            allowNull: false,
+        },
+        sender_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        receiver_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        seen_status: DataTypes.BOOLEAN,
+        shipped: DataTypes.BOOLEAN
     }, {
         sequelize,
         modelName: 'Message',
     });
-
-    //has one user message id
-    let User_message = sequelize.define('User_messages')
-    Message.hasMany(User_message, {
-        foreignKey: 'id'
-    })
-
     return Message;
 };

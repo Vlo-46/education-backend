@@ -3,7 +3,6 @@ const User = db.users;
 const jwt = require('jsonwebtoken');
 const keys = require('../utils/keys');
 
-
 const bcrypt = require('bcryptjs');
 const {validationResult} = require('express-validator');
 
@@ -154,14 +153,15 @@ const all_users = async (req, res) => {
         .catch(e => {
             res.send({msg: e})
         });
-}
+};
 
-
-//testing
 const get_user = async (req, res) => {
-    const {id} = req.query;
-    let user = await User.findOne({where: {id}})
-    res.send({user})
-}
+    let authHeader = req.headers.authorization;
+    if (authHeader) {
+        const {id} = req.query;
+        let user = await User.findOne({where: {id}})
+        res.send(user)
+    }
+};
 
 module.exports = {register, login, getCandidate, changePassword, deleteAccount, all_users, get_user};
