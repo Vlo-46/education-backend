@@ -1,6 +1,8 @@
 const db = require('../models');
 const Subject = db.subject;
 const SubSubject = db.subSubject;
+const jwt = require('jsonwebtoken')
+const keys = require('../utils/keys')
 
 const getSubject = async (req, res) => {
     Subject.findAll({include: SubSubject})
@@ -103,6 +105,25 @@ const updateSubSubject = async (req, res) => {
         });
 };
 
+const getSingleSubject = async (req, res) => {
+    let authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        let candidate = jwt.verify(token, keys.jwtSecret);
+        if (candidate) {
+            Subject.findOne({
+                where: {id: req.query.id}
+            })
+                .then(data => {
+                    res.send(data)
+                })
+                .catch(e => {
+                    res.send(e)
+                })
+        }
+    }
+}
+
 module.exports = {
     getSubject,
     createSubject,
@@ -110,5 +131,6 @@ module.exports = {
     updateSubject,
     createSubSubject,
     deleteSubSubject,
-    updateSubSubject
+    updateSubSubject,
+    getSingleSubject
 };

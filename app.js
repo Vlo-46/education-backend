@@ -40,6 +40,8 @@ app.use('/api/subject', subjectRouter)
 app.use('/api/profile', profileRouter)
 app.use('/api/message', messageRouter)
 
+
+//sockets
 const {Op} = require("sequelize");
 
 const db = require("./models");
@@ -48,6 +50,9 @@ const Message = db.message
 
 
 io.on('connection', socket => {
+    // private chat in profile page
+
+    // get all messages
     socket.on('all messages', data => {
         let {candidateId, someId} = data;
         Message.findAll({
@@ -70,6 +75,7 @@ io.on('connection', socket => {
 
     })
 
+    // create new message
     socket.on('new message', data => {
         Message.create({
             message: data.message,
@@ -87,8 +93,8 @@ io.on('connection', socket => {
             })
     })
 
+    // delete message
     socket.on('delete message', id => {
-        console.log(id)
         Message.destroy({where: {id}})
             .then(num => {
                 if (num[0] === 1) {
@@ -102,6 +108,7 @@ io.on('connection', socket => {
             })
     })
 
+    // end private chat sockets
 
     socket.on('disconnected', () => {
         console.log('disconnected')

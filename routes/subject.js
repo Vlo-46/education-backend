@@ -16,4 +16,6 @@ router.post('/delete_sub_subject', subjectController.deleteSubSubject)
 
 router.post('/update_sub_subject', subjectController.updateSubSubject)
 
+router.get('/get_single_subject', subjectController.getSingleSubject)
+
 module.exports = router;
