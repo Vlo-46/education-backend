@@ -49,6 +49,9 @@ const User = db.users;
 const Message = db.message
 
 
+const rooms = []
+const roomMessages = []
+
 io.on('connection', socket => {
     // private chat in profile page
 
@@ -109,6 +112,61 @@ io.on('connection', socket => {
     })
 
     // end private chat sockets
+
+    // room
+    socket.on('connect room', data => {
+        let isRoom = false
+        rooms.forEach(item => {
+            Object.keys(item).forEach(i => {
+                i === data.room.roomId ? isRoom = true : null
+            })
+        })
+        if (!isRoom) {
+            let newObj = {
+                [data.room.roomId]: [
+                    data.room.user
+                ]
+            }
+            rooms.push(newObj)
+        } else {
+            rooms.forEach(item => {
+                if (item[data.room.roomId]) {
+                    item[data.room.roomId].push(data.room.user)
+                } else {
+                    console.log('error')
+                }
+            })
+        }
+
+        rooms.forEach(room => {
+            socket.broadcast.emit('room', room[data.room.roomId])
+        })
+
+        isRoom = false
+        socket.on('disconnect', () => {
+            rooms.forEach((item, index) => {
+                if (item[data.room.roomId]) {
+                    for (let i = 0; i < item[data.room.roomId].length; i++) {
+                        if (item[data.room.roomId][i].id === data.room.user.id) {
+                            let index = item[data.room.roomId].indexOf(item[data.room.roomId][i])
+                            item[data.room.roomId].splice(index, 1)
+                        }
+                    }
+                } else {
+                    Object.keys(item).forEach(key => {
+                        let idx = rooms.indexOf(item[key])
+                        delete rooms.splice(idx, 1)
+                    })
+                }
+            })
+        })
+    })
+
+    socket.on('room msg', data => {
+        roomMessages.push(data)
+        socket.broadcast.emit('room all messages', roomMessages)
+    })
+    socket.broadcast.emit('room all messages', roomMessages)
 
     socket.on('disconnected', () => {
         console.log('disconnected')
