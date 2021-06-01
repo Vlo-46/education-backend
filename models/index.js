@@ -39,7 +39,7 @@ db.blog_comments = require('./blog_comments')(sequelize, Sequelize)
 db.subject = require('./subject')(sequelize, Sequelize)
 db.subSubject = require('./subsubject')(sequelize, Sequelize)
 db.users = require('./user')(sequelize, Sequelize)
-db.free_hourses = require('./free_hours')(sequelize, Sequelize)
+db.free_hours = require('./free_hours')(sequelize, Sequelize)
 db.message = require('./message')(sequelize, Sequelize)
 db.teacher_review = require('./teacher_review')(sequelize, Sequelize)
 db.teacher_education = require('./teacher_education')(sequelize, Sequelize)
@@ -50,6 +50,7 @@ db.teacherAddress = require('./teacheraddress')(sequelize, Sequelize)
 db.teacher_phone = require('./teacher_phone')(sequelize, Sequelize)
 db.teacher_video = require('./teacher_video')(sequelize, Sequelize)
 db.notification = require('./notification')(sequelize, Sequelize)
+db.free_times = require('./free_times')(sequelize, Sequelize)
 
 
 module.exports = db;

@@ -41,10 +41,6 @@ module.exports = (sequelize, DataTypes) => {
         modelName: 'User',
     });
 
-    let Free_hours = sequelize.define('Free_hours')
-    User.hasMany(Free_hours, {
-        foreignKey: 'teacher_id'
-    })
 
     // let Teacher_student = sequelize.define('Teacher_student')
     // User.hasMany(Teacher_student, {
@@ -98,6 +94,11 @@ module.exports = (sequelize, DataTypes) => {
     let Notification = sequelize.define('Notification')
     User.hasMany(Notification, {
         foreignKey: 'teacher_id'
+    })
+
+    let Free_hours = sequelize.define('Free_hours')
+    User.hasMany(Free_hours, {
+        foreignKey: "teacher_id"
     })
 
     return User;

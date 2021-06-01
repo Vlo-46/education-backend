@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const helmet = require('helmet');
 const compression = require('compression');
+// const passport = require('passport');
+// const FacebookStrategy = require('passport-facebook').Strategy;
+const session = require('express-session');
 
 const app = express();
 
@@ -26,6 +29,32 @@ app.use(cors())
 
 app.use(helmet());
 app.use(compression());
+
+app.use(session({
+    resave: false,
+    saveUninitialized: true,
+    secret: keys.sessionSecret
+}));
+
+// app.use(passport.initialize());
+// app.use(passport.session());
+//
+// passport.serializeUser(function (user, cb) {
+//     cb(null, user);
+// });
+//
+// passport.deserializeUser(function (obj, cb) {
+//     cb(null, obj);
+// });
+//
+// passport.use(new FacebookStrategy({
+//         clientID: keys.facebookAuth.clientID,
+//         clientSecret: keys.facebookAuth.clientSecret,
+//         callbackURL: keys.facebookAuth.callbackURL
+//     }, function (accessToken, refreshToken, profile, done) {
+//         return done(null, profile);
+//     }
+// ));
 
 // routes
 const blogRouter = require('./routes/blog')
@@ -51,6 +80,7 @@ const Message = db.message
 
 const rooms = []
 const roomMessages = []
+const roomVideo = []
 
 io.on('connection', socket => {
     // private chat in profile page
@@ -167,6 +197,23 @@ io.on('connection', socket => {
         socket.broadcast.emit('room all messages', roomMessages)
     })
     socket.broadcast.emit('room all messages', roomMessages)
+
+    socket.on('stream', data => {
+        let streamObj = {
+            streamId: data.streamId,
+            candidateId: data.candidateId,
+            video: true,
+            audio: false,
+            demonstration: false
+        }
+        roomVideo.push(streamObj)
+        socket.broadcast.emit('streamData', roomVideo)
+    })
+
+    // request course
+    socket.on('send course request', data => {
+        console.log(data)
+    })
 
     socket.on('disconnected', () => {
         console.log('disconnected')

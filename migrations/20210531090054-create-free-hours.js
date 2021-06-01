@@ -10,26 +10,23 @@ module.exports = {
       },
       teacher_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
-      },
-      date: {
-        type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false,
       },
       start_time: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false,
       },
       end_time: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false,
       },
-      status: {
-        type: Sequelize.ENUM('approved', 'denied', 'during')
-      },
-      charged: {
+      free: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+      },
+      weekday: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

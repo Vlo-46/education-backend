@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const keys = require('../utils/keys')
 const db = require('../models')
 const User = db.users
-const Free_hours = db.free_hourses
+const Free_hours = db.free_hours
 const Notification = db.notification
 const Teacher_review = db.teacher_review
 const Teacher_education = db.teacher_education
@@ -12,6 +12,7 @@ const Teacher_language_of_instruction = db.teacher_language_of_instruction
 const TeacherAddress = db.teacherAddress
 const Teacher_phone = db.teacher_phone
 const Teacher_video = db.teacher_video
+const Free_times = db.free_times
 
 // teacher calendar
 const createTeacherFreeHours = async (req, res) => {
@@ -69,7 +70,8 @@ const getTeacher = async (req, res) => {
                 TeacherAddress,
                 Teacher_phone,
                 Teacher_video,
-                Notification
+                Notification,
+                Free_hours
             ]
         })
             .then(data => {
@@ -468,6 +470,87 @@ const checkRequest = async (req, res) => {
     }
 }
 
+// teacher free times
+// get teacher free hours
+const getFreeHours = async (req, res) => {
+    let authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        let candidate = jwt.verify(token, keys.jwtSecret);
+        if (candidate) {
+            Free_hours.findAll({
+                where: {teacher_id: candidate.id}
+            })
+                .then(data => {
+                    let free_hours = {}
+                    data.forEach(f => {
+                        if (f.weekday in free_hours) {
+                            free_hours[f.weekday].push(f);
+                        } else {
+                            free_hours[f.weekday] = [];
+                            free_hours[f.weekday].push(f);
+                        }
+                    })
+                    res.send(free_hours)
+                })
+                .catch(e => {
+                    res.send({msg: 'error', err: e})
+                })
+        }
+    }
+}
+
+// create teacher free hours
+const createFreeHours = async (req, res) => {
+    let authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        let candidate = jwt.verify(token, keys.jwtSecret);
+        if (candidate) {
+            Free_hours.create({
+                teacher_id: candidate.id,
+                start_time: req.body.start_time,
+                end_time: req.body.end_time,
+                weekday: req.body.weekday,
+                free: false
+            })
+                .then(data => {
+                    res.send(data)
+                })
+                .catch(e => {
+                    res.send({msg: 'error', err: e})
+                })
+        } else {
+            res.send({msg: "invalid token"})
+        }
+    }
+}
+
+// delete teacher free hours
+
+const deleteFreeHours = async (req, res) => {
+    let authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        let candidate = jwt.verify(token, keys.jwtSecret);
+        if (candidate) {
+            Free_hours.destroy({
+                where: {id: req.body.id}
+            })
+                .then(num => {
+                    if (num[0] === 1) {
+                        res.send({msg: 'error'})
+                    } else {
+                        res.send({msg: 'ok'})
+                    }
+                })
+                .catch(err => {
+                    res.send({msg: 'error'})
+                });
+        }
+    }
+}
+
 module.exports = {
     createTeacherFreeHours,
     createTeacherReview,
@@ -487,5 +570,8 @@ module.exports = {
     createTeacherVideo,
     deleteTeacherVideo,
     sendRequestToTeacher,
-    checkRequest
+    checkRequest,
+    getFreeHours,
+    createFreeHours,
+    deleteFreeHours
 }

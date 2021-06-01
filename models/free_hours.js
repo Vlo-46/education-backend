@@ -1,5 +1,7 @@
 'use strict';
-const {Model} = require('sequelize');
+const {
+    Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Free_hours extends Model {
         /**
@@ -14,22 +16,21 @@ module.exports = (sequelize, DataTypes) => {
     Free_hours.init({
         teacher_id: {
             type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        date: {
-            type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
         },
         start_time: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
         },
         end_time: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
         },
-        status: DataTypes.ENUM('approved', 'denied', 'during'),
-        charged: {
+        weekday: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        free: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
         }
@@ -38,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
         modelName: 'Free_hours',
     });
 
-    let User = sequelize.define('User')
+    let User = sequelize.define('User');
     Free_hours.belongsTo(User, {
         foreignKey: 'id'
     })

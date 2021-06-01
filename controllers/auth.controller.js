@@ -6,6 +6,16 @@ const keys = require('../utils/keys');
 const bcrypt = require('bcryptjs');
 const {validationResult} = require('express-validator');
 
+const Free_hours = db.free_hours
+const Teacher_review = db.teacher_review
+const Teacher_education = db.teacher_education
+const Teacher_certificate = db.teacher_certificate
+const Teacher_work_experience = db.teacher_work_experience
+const Teacher_language_of_instruction = db.teacher_language_of_instruction
+const TeacherAddress = db.teacherAddress
+const Teacher_phone = db.teacher_phone
+const Teacher_video = db.teacher_video
+
 // register user
 const register = async (req, res) => {
     const errors = validationResult(req)
@@ -167,8 +177,20 @@ const all_users = async (req, res) => {
 
 const get_user = async (req, res) => {
     const {id} = req.query;
+
     User.findOne({
         where: {id},
+        include: [
+            Teacher_review,
+            Teacher_education,
+            Teacher_certificate,
+            Teacher_work_experience,
+            Teacher_language_of_instruction,
+            TeacherAddress,
+            Teacher_phone,
+            Teacher_video,
+            Free_hours
+        ]
     })
         .then(data => {
             res.send(data)

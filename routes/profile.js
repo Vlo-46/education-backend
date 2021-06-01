@@ -5,7 +5,7 @@ const profileController = require('../controllers/profile.controller')
 //teacher
 router.get('/teacher/get_teacher', profileController.getTeacher)
 
-router.post('/teacher/create_free_hours', profileController.createTeacherFreeHours)
+// router.post('/teacher/create_free_hours', profileController.createTeacherFreeHours)
 
 router.post('/teacher/create_review', profileController.createTeacherReview)
 
@@ -32,5 +32,9 @@ router.post('/teacher/delete_video', profileController.deleteTeacherVideo)
 
 router.post('/teacher/send_request_to_teacher', profileController.sendRequestToTeacher)
 router.post('/teacher/check_request', profileController.checkRequest)
+
+router.get('/teacher/get_free_hours', profileController.getFreeHours)
+router.post('/teacher/create_free_hours', profileController.createFreeHours)
+router.post('/teacher/delete_free_hours', profileController.deleteFreeHours)
 
 module.exports = router;
