@@ -93,12 +93,29 @@ module.exports = (sequelize, DataTypes) => {
 
     let Notification = sequelize.define('Notification')
     User.hasMany(Notification, {
+        as: "student_notification",
+        foreignKey: 'student_id'
+    })
+    User.hasMany(Notification, {
+        as: "teacher_notification",
         foreignKey: 'teacher_id'
     })
+
 
     let Free_hours = sequelize.define('Free_hours')
     User.hasMany(Free_hours, {
         foreignKey: "teacher_id"
+    })
+
+    // teacher students
+    let Teacher_student = sequelize.define('Teacher_student')
+    User.hasMany(Teacher_student, {
+        as: "teacher_students",
+        foreignKey: "teacher_id"
+    })
+    User.hasMany(Teacher_student, {
+        as: "student_teachers",
+        foreignKey: "student_id"
     })
 
     return User;

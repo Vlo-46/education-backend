@@ -13,6 +13,10 @@ const TeacherAddress = db.teacherAddress
 const Teacher_phone = db.teacher_phone
 const Teacher_video = db.teacher_video
 const Free_times = db.free_times
+const Lessons_hours = db.lessons_hours
+const Teacher_student = db.teacher_student
+
+const {Op} = require("sequelize");
 
 // teacher calendar
 const createTeacherFreeHours = async (req, res) => {
@@ -70,18 +74,76 @@ const getTeacher = async (req, res) => {
                 TeacherAddress,
                 Teacher_phone,
                 Teacher_video,
-                Notification,
-                Free_hours
-            ]
+                {
+                    model: Teacher_student,
+                    as: "teacher_students",
+                },
+                {
+                    model: Teacher_student,
+                    as: "student_teachers",
+                },
+                {
+                    model: Notification,
+                    as: "teacher_notification",
+                    include: [
+                        {
+                            model: Lessons_hours,
+                            where: {
+                                [Op.or]: [
+                                    {teacher_id: id},
+                                    {student_id: id}
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    model: Notification,
+                    as: "student_notification",
+                    include: [
+                        {
+                            model: Lessons_hours,
+                            where: {
+                                [Op.or]: [
+                                    {teacher_id: id},
+                                    {student_id: id}
+                                ]
+                            }
+                        }
+                    ]
+                },
+                Free_hours,
+            ],
         })
-            .then(data => {
-                res.send(data)
+            .then(async data => {
+                let studentIds = []
+                let teacherIds = []
+
+                if (data.role === 'student' && data.student_teachers.length) {
+                    data.student_teachers.forEach(i => {
+                        teacherIds.push(i.teacher_id)
+                    })
+                } else {
+                    data.teacher_students.forEach(i => {
+                        studentIds.push(i.student_id)
+                    })
+                }
+
+                const friends = await User.findAll({
+                    where: {
+                        id: teacherIds.length ? teacherIds : studentIds
+                    }
+                })
+
+                res.send({user: data, friends})
+                // res.send(data)
             })
             .catch(e => {
                 res.send(e)
             })
     }
 }
+
 
 // teacher education
 // create
@@ -297,7 +359,6 @@ const createTeacherAddress = async (req, res) => {
                     res.send(e)
                 })
         }
-
     }
 }
 
@@ -512,7 +573,7 @@ const createFreeHours = async (req, res) => {
                 start_time: req.body.start_time,
                 end_time: req.body.end_time,
                 weekday: req.body.weekday,
-                free: false
+                free: true
             })
                 .then(data => {
                     res.send(data)
@@ -573,5 +634,5 @@ module.exports = {
     checkRequest,
     getFreeHours,
     createFreeHours,
-    deleteFreeHours
+    deleteFreeHours,
 }

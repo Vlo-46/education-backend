@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Free_hours', {
+    await queryInterface.createTable('Lessons_hours', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,24 +9,17 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       teacher_id: {
+        type: Sequelize.INTEGER
+      },
+      student_id: {
+        type: Sequelize.INTEGER
+      },
+      notification_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: false
       },
-      start_time: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      end_time: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      free: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true
-      },
-      weekday: {
-        type: Sequelize.STRING,
-        allowNull: false,
+      hours: {
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,
@@ -39,6 +32,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Free_hours');
+    await queryInterface.dropTable('Lessons_hours');
   }
 };

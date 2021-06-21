@@ -24,8 +24,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.ENUM('during', 'approved', 'denied')
         },
         seen: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         },
     }, {
         sequelize,
@@ -35,6 +35,11 @@ module.exports = (sequelize, DataTypes) => {
     let User = sequelize.define('User')
     Notification.belongsTo(User, {
         foreignKey: 'id'
+    })
+
+    let Lessons_hours = sequelize.define('Lessons_hours')
+    Notification.hasOne(Lessons_hours, {
+        foreignKey: 'notification_id'
     })
 
     return Notification;

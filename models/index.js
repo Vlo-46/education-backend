@@ -51,6 +51,7 @@ db.teacher_phone = require('./teacher_phone')(sequelize, Sequelize)
 db.teacher_video = require('./teacher_video')(sequelize, Sequelize)
 db.notification = require('./notification')(sequelize, Sequelize)
 db.free_times = require('./free_times')(sequelize, Sequelize)
-
+db.lessons_hours = require('./lessons_hours')(sequelize, Sequelize)
+db.teacher_student = require('./teacher_student')(sequelize, Sequelize)
 
 module.exports = db;

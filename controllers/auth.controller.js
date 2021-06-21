@@ -132,6 +132,8 @@ const changePassword = async (req, res) => {
                 .catch(e => {
                     res.send({msg: 'error'})
                 });
+        }else {
+            res.send({msg: 'error'})
         }
     }
 };
@@ -158,6 +160,8 @@ const deleteAccount = async (req, res) => {
                 .catch(err => {
                     res.send({msg: 'error'})
                 });
+        }else {
+            res.send({msg: 'error'})
         }
     } else {
         res.send({msg: 'error'})
@@ -177,7 +181,6 @@ const all_users = async (req, res) => {
 
 const get_user = async (req, res) => {
     const {id} = req.query;
-
     User.findOne({
         where: {id},
         include: [

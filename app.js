@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors')
+const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 // const passport = require('passport');
 // const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
+const jwt = require('jsonwebtoken')
 
 const app = express();
 
@@ -37,7 +38,7 @@ app.use(session({
 }));
 
 // app.use(passport.initialize());
-// app.use(passport.session());
+// app.use(passport.session());gt
 //
 // passport.serializeUser(function (user, cb) {
 //     cb(null, user);
@@ -76,6 +77,10 @@ const {Op} = require("sequelize");
 const db = require("./models");
 const User = db.users;
 const Message = db.message
+const Notification = db.notification
+const Lessons_hours = db.lessons_hours
+const Teacher_student = db.teacher_student
+const Free_hours = db.free_hours
 
 
 const rooms = []
@@ -211,14 +216,123 @@ io.on('connection', socket => {
     })
 
     // request course
-    socket.on('send course request', data => {
-        console.log(data)
+    socket.on('send course request', async data => {
+        let {token, candidateId, selected_hours} = data
+
+        let verifyCandidate = jwt.verify(token, keys.jwtSecret);
+        const candidate = await User.findOne({
+            where: {id: verifyCandidate.id}
+        })
+
+        await Notification.create({
+            teacher_id: candidateId,
+            student_id: candidate.id,
+            status: 'during',
+            seen: false
+        })
+            .then(async data => {
+                let newArray = []
+
+                let sortLessons = (arr, int) => {
+                    let index = 0;
+                    for (let i = 0; i < int; i++) {
+                        if (i - (index * arr.length) < arr.length) {
+                            newArray[i] = arr[i - (index * arr.length)]
+                        } else {
+                            index++
+                            newArray[i] = arr[i - (index * arr.length)]
+                        }
+                    }
+                }
+                sortLessons(selected_hours, 8)
+
+                await Lessons_hours.create({
+                    hours: JSON.stringify(newArray),
+                    teacher_id: candidateId,
+                    student_id: candidate.id,
+                    notification_id: data.id
+                })
+                Notification.findOne({
+                    where: {id: data.id},
+                    include: [Lessons_hours]
+                })
+                    .then(response => {
+                        socket.broadcast.emit('new notification', response)
+                    })
+            })
+            .catch(e => {
+                console.log(e)
+            })
+    })
+
+    // seen notification
+    socket.on('check notification', data => {
+        const {notification_id, status} = data;
+        Notification.update({status, seen: true}, {
+            where: {id: notification_id}
+        })
+            .then(async num => {
+                if (num[0] === 1) {
+                    if (status === 'approved') {
+                        await Teacher_student.create({
+                            student_id: data.student_id,
+                            teacher_id: data.teacher_id
+                        })
+
+                        let lessonsId = []
+                        let lessons = JSON.parse(data.lessons.hours)
+                        lessons.forEach(i => {
+                            lessonsId.push(i.id)
+                        })
+                        lessonsId.forEach(id => {
+                            Free_hours.update({free: false}, {
+                                where: {id}
+                            })
+                                .then(num => {
+                                    if (num[0] === 1) {
+                                        console.log('ok')
+                                    } else {
+                                        console.log('error')
+                                    }
+                                })
+                        })
+                    }
+                    socket.broadcast.emit('checked notification', {msg: "ok", status, notification_id})
+                } else {
+                    socket.broadcast.emit('checked notification', {msg: "error"})
+                }
+            })
+            .catch(e => {
+                socket.broadcast.emit('checked notification', {msg: "error"})
+            })
     })
 
     socket.on('disconnected', () => {
         console.log('disconnected')
     })
 })
+
+
+// quantity in course
+
+// let x = [1, 2, 3, 4, 5, 6]
+// let newArray = []
+//
+// let func = (arr, int) => {
+//     let index = 0;
+//     for (let i = 0; i < int; i++) {
+//         if (i - (index * arr.length) < arr.length) {
+//             newArray[i] = arr[i - (index * arr.length)]
+//         } else {
+//             index++
+//             newArray[i] = arr[i - (index * arr.length)]
+//         }
+//     }
+// }
+// func(x, 8)
+//
+// console.log(newArray)
+
 
 // server
 const PORT = process.env.PORT || 5000;
